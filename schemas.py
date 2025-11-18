@@ -12,37 +12,33 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Literal
 
-# Example schemas (replace with your own):
-
-class User(BaseModel):
-    """
-    Users collection schema
-    Collection name: "user" (lowercase of class name)
-    """
-    name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
-    is_active: bool = Field(True, description="Whether user is active")
+# Business-specific schemas for Chirag Battery
 
 class Product(BaseModel):
     """
-    Products collection schema
-    Collection name: "product" (lowercase of class name)
+    Battery and inverter products
+    Collection: "product"
     """
-    title: str = Field(..., description="Product title")
-    description: Optional[str] = Field(None, description="Product description")
-    price: float = Field(..., ge=0, description="Price in dollars")
-    category: str = Field(..., description="Product category")
-    in_stock: bool = Field(True, description="Whether product is in stock")
+    name: str = Field(..., description="Product name")
+    brand: Literal["Amaron", "Exide", "Luminous"] = Field(..., description="Brand name")
+    type: Literal["bike-battery", "car-battery", "inverter", "inverter-battery"] = Field(..., description="Product type")
+    capacity_ah: Optional[float] = Field(None, ge=0, description="Capacity in Ah where applicable")
+    warranty_months: Optional[int] = Field(None, ge=0, description="Warranty in months")
+    price: Optional[float] = Field(None, ge=0, description="Approximate MRP or selling price")
+    description: Optional[str] = Field(None, description="Short description")
+    in_stock: bool = Field(True, description="Availability status")
 
-# Add your own schemas here:
-# --------------------------------------------------
-
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class Inquiry(BaseModel):
+    """
+    Customer inquiries and callbacks
+    Collection: "inquiry"
+    """
+    name: str = Field(..., description="Customer name")
+    phone: str = Field(..., description="Phone/WhatsApp number")
+    message: Optional[str] = Field(None, description="Additional message or requirement")
+    product_type: Optional[str] = Field(None, description="Requested product type e.g., car-battery")
+    brand: Optional[str] = Field(None, description="Preferred brand")
+    preferred_contact: Literal["call", "whatsapp"] = Field("whatsapp", description="Preferred contact method")
+    city: Optional[str] = Field("Veraval, Gir Somnath", description="Customer city")
